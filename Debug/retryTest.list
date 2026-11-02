@@ -1,0 +1,699 @@
+
+retryTest.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   00000194  08000000  08000000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         00000330  08000194  08000194  00001194  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .rodata       00000000  080004c4  080004c4  00002004  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .ARM.extab    00000000  080004c4  080004c4  00002004  2**0
+                  CONTENTS, READONLY
+  4 .ARM          00000000  080004c4  080004c4  00002004  2**0
+                  CONTENTS, READONLY
+  5 .preinit_array 00000000  080004c4  080004c4  00002004  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .init_array   00000004  080004c4  080004c4  000014c4  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .fini_array   00000004  080004c8  080004c8  000014c8  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  8 .data         00000004  20000000  080004cc  00002000  2**4
+                  CONTENTS, ALLOC, LOAD, DATA
+  9 .bss          0000001c  20000004  080004d0  00002004  2**2
+                  ALLOC
+ 10 ._user_heap_stack 00000600  20000020  080004d0  00002020  2**0
+                  ALLOC
+ 11 .ARM.attributes 00000030  00000000  00000000  00002004  2**0
+                  CONTENTS, READONLY
+ 12 .debug_line   00000198  00000000  00000000  00002034  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 13 .debug_line_str 0000006b  00000000  00000000  000021cc  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 14 .debug_info   00000055  00000000  00000000  00002237  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 15 .debug_abbrev 00000038  00000000  00000000  0000228c  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 16 .debug_aranges 00000048  00000000  00000000  000022c8  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 17 .debug_str    00000087  00000000  00000000  00002310  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 18 .debug_rnglists 00000019  00000000  00000000  00002397  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 19 .debug_frame  0000002c  00000000  00000000  000023b0  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+08000194 <__do_global_dtors_aux>:
+ 8000194:	b510      	push	{r4, lr}
+ 8000196:	4c05      	ldr	r4, [pc, #20]	@ (80001ac <__do_global_dtors_aux+0x18>)
+ 8000198:	7823      	ldrb	r3, [r4, #0]
+ 800019a:	b933      	cbnz	r3, 80001aa <__do_global_dtors_aux+0x16>
+ 800019c:	4b04      	ldr	r3, [pc, #16]	@ (80001b0 <__do_global_dtors_aux+0x1c>)
+ 800019e:	b113      	cbz	r3, 80001a6 <__do_global_dtors_aux+0x12>
+ 80001a0:	4804      	ldr	r0, [pc, #16]	@ (80001b4 <__do_global_dtors_aux+0x20>)
+ 80001a2:	f3af 8000 	nop.w
+ 80001a6:	2301      	movs	r3, #1
+ 80001a8:	7023      	strb	r3, [r4, #0]
+ 80001aa:	bd10      	pop	{r4, pc}
+ 80001ac:	20000004 	.word	0x20000004
+ 80001b0:	00000000 	.word	0x00000000
+ 80001b4:	080004ac 	.word	0x080004ac
+
+080001b8 <frame_dummy>:
+ 80001b8:	b508      	push	{r3, lr}
+ 80001ba:	4b03      	ldr	r3, [pc, #12]	@ (80001c8 <frame_dummy+0x10>)
+ 80001bc:	b11b      	cbz	r3, 80001c6 <frame_dummy+0xe>
+ 80001be:	4903      	ldr	r1, [pc, #12]	@ (80001cc <frame_dummy+0x14>)
+ 80001c0:	4803      	ldr	r0, [pc, #12]	@ (80001d0 <frame_dummy+0x18>)
+ 80001c2:	f3af 8000 	nop.w
+ 80001c6:	bd08      	pop	{r3, pc}
+ 80001c8:	00000000 	.word	0x00000000
+ 80001cc:	20000008 	.word	0x20000008
+ 80001d0:	080004ac 	.word	0x080004ac
+
+080001d4 <main>:
+.text
+main:
+
+	@i had a problem with sleeping with WFI and debugger disconnecting apparently
+	@accoridng to google this is a setting I need to enable for this called DBGMCU_CR that allows the debugger to handle this
+	LDR r0, =0xE0042004      @ DBGMCU_CR
+ 80001d4:	4876      	ldr	r0, [pc, #472]	@ (80003b0 <EXTI15_10_IRQHandler+0x18>)
+	LDR	r1, [r0]
+ 80001d6:	6801      	ldr	r1, [r0, #0]
+    ORR r1, r1, #(1 << 0)
+ 80001d8:	f041 0101 	orr.w	r1, r1, #1
+    STR r1, [r0]
+ 80001dc:	6001      	str	r1, [r0, #0]
+	@enable PWR Clock APB1
+	LDR r0, =0x40023800
+ 80001de:	4875      	ldr	r0, [pc, #468]	@ (80003b4 <EXTI15_10_IRQHandler+0x1c>)
+	LDR	r1, [r0, #0x40]
+ 80001e0:	6c01      	ldr	r1, [r0, #64]	@ 0x40
+    ORR r1, r1, #(1 << 28)
+ 80001e2:	f041 5180 	orr.w	r1, r1, #268435456	@ 0x10000000
+    STR r1, [r0, #0x40]
+ 80001e6:	6401      	str	r1, [r0, #64]	@ 0x40
+    @enable Backup Domain Access
+    LDR r0, =0x40007000
+ 80001e8:	4873      	ldr	r0, [pc, #460]	@ (80003b8 <EXTI15_10_IRQHandler+0x20>)
+    LDR r1, [r0, #0x00]
+ 80001ea:	6801      	ldr	r1, [r0, #0]
+    ORR r1, r1, #(1 << 8)
+ 80001ec:	f441 7180 	orr.w	r1, r1, #256	@ 0x100
+    STR r1, [r0, #0x00]
+ 80001f0:	6001      	str	r1, [r0, #0]
+	@enable LSE in RCC_BDCR
+    LDR r0, =0x40023800
+ 80001f2:	4870      	ldr	r0, [pc, #448]	@ (80003b4 <EXTI15_10_IRQHandler+0x1c>)
+    LDR r1, [r0, #0x70]
+ 80001f4:	6f01      	ldr	r1, [r0, #112]	@ 0x70
+    @set LSE drive strength to the highest setting
+    BIC r1, r1, #(3 << 3)
+ 80001f6:	f021 0118 	bic.w	r1, r1, #24
+    ORR r1, r1, #(3 << 3)
+ 80001fa:	f041 0118 	orr.w	r1, r1, #24
+    @enable LSE
+    ORR r1, r1, #1
+ 80001fe:	f041 0101 	orr.w	r1, r1, #1
+    STR r1, [r0, #0x70]
+ 8000202:	6701      	str	r1, [r0, #112]	@ 0x70
+
+08000204 <lse_waiter>:
+    @wait for LSE
+	lse_waiter:
+    	LDR r1, [r0, #0x70]
+ 8000204:	6f01      	ldr	r1, [r0, #112]	@ 0x70
+    	TST r1, #(1 << 1)
+ 8000206:	f011 0f02 	tst.w	r1, #2
+    	BEQ lse_waiter
+ 800020a:	d0fb      	beq.n	8000204 <lse_waiter>
+	@now set as real time clock, CLEAAR rtcsel, lse, rtc enable
+	LDR r0, =0x40023800
+ 800020c:	4869      	ldr	r0, [pc, #420]	@ (80003b4 <EXTI15_10_IRQHandler+0x1c>)
+	LDR r1, [r0, #0x70]
+ 800020e:	6f01      	ldr	r1, [r0, #112]	@ 0x70
+	BIC r1, r1, #(3 << 8)
+ 8000210:	f421 7140 	bic.w	r1, r1, #768	@ 0x300
+	ORR r1, r1, #(1 << 8)
+ 8000214:	f441 7180 	orr.w	r1, r1, #256	@ 0x100
+	ORR r1, r1, #(1 << 15)
+ 8000218:	f441 4100 	orr.w	r1, r1, #32768	@ 0x8000
+	STR r1, [r0, #0x70]
+ 800021c:	6701      	str	r1, [r0, #112]	@ 0x70
+	@now read from clock
+	LDR r0, =0x40002800
+ 800021e:	4867      	ldr	r0, [pc, #412]	@ (80003bc <EXTI15_10_IRQHandler+0x24>)
+	LDR r2, [r0, #0x28]		@this gets precise
+ 8000220:	6a82      	ldr	r2, [r0, #40]	@ 0x28
+	LDR r1, [r0, #0x00]			@read TR which gives hours minutem seconds
+ 8000222:	6801      	ldr	r1, [r0, #0]
+	LDR r3, [r0, #0x04]		@read the DR section which gives months, year, day
+ 8000224:	6843      	ldr	r3, [r0, #4]
+	MOVW r6, #0x0000			@this will load 2^31 the modulus of my LCG
+ 8000226:	f240 0600 	movw	r6, #0
+	MOVT r6, #0x8000
+ 800022a:	f2c8 0600 	movt	r6, #32768	@ 0x8000
+	SUBS r6, r6, #1	@subtract by 1
+ 800022e:	3e01      	subs	r6, #1
+	MOV r9, #0
+ 8000230:	f04f 0900 	mov.w	r9, #0
+	ADD r9, r9, r1	@ I addd together all the times
+ 8000234:	4489      	add	r9, r1
+	ADD r9, r9, r2
+ 8000236:	4491      	add	r9, r2
+	ADD r9, r9, r3
+ 8000238:	4499      	add	r9, r3
+	AND r9, r9, r6
+ 800023a:	ea09 0906 	and.w	r9, r9, r6
+	MOVW r7, #0x4E6D 		@this will set this register to 1103515245 the multiplier
+ 800023e:	f644 676d 	movw	r7, #20077	@ 0x4e6d
+	MOVT r7, #0x41C6
+ 8000242:	f2c4 17c6 	movt	r7, #16838	@ 0x41c6
+	MOVW r8, #12345			@this is the adder of 12345
+ 8000246:	f243 0839 	movw	r8, #12345	@ 0x3039
+	MOVT r8, #0
+ 800024a:	f2c0 0800 	movt	r8, #0
+	@in the previous LAB 2 I forgopt to disable the RTC after im done using it so I will do that here
+	@disable lse first
+	LDR r0, =0x40023800
+ 800024e:	4859      	ldr	r0, [pc, #356]	@ (80003b4 <EXTI15_10_IRQHandler+0x1c>)
+    LDR r1, [r0, #0x70]
+ 8000250:	6f01      	ldr	r1, [r0, #112]	@ 0x70
+	BIC r1, r1, #(1 << 0) @lse off
+ 8000252:	f021 0101 	bic.w	r1, r1, #1
+    @disable rtcc
+	BIC r1, r1, #(1 << 15)
+ 8000256:	f421 4100 	bic.w	r1, r1, #32768	@ 0x8000
+	STR r1, [r0, #0x70]
+ 800025a:	6701      	str	r1, [r0, #112]	@ 0x70
+	@this is very important since this allows us to save energy its like leaving the bathroom light on when not using it
+	@this is setting GPIO input and output feel free to skip to loop
+	LDR r0, =0x40023830 		@ rcc AHB1ENR base address
+ 800025c:	4858      	ldr	r0, [pc, #352]	@ (80003c0 <EXTI15_10_IRQHandler+0x28>)
+	LDR r1, [r0]				@load from ahb1enr address
+ 800025e:	6801      	ldr	r1, [r0, #0]
+	ORR r1, r1, #0x05			@ this sets ports A And C for us to use for clokcing
+ 8000260:	f041 0105 	orr.w	r1, r1, #5
+	STR r1, [r0]				@ we set it
+ 8000264:	6001      	str	r1, [r0, #0]
+	@I will setup the user button here at PORT C pin 13 as user input
+	LDR r0, =0x40020800 		@at Port C base address
+ 8000266:	4857      	ldr	r0, [pc, #348]	@ (80003c4 <EXTI15_10_IRQHandler+0x2c>)
+	LDR r1, [r0]				@read GPIOC
+ 8000268:	6801      	ldr	r1, [r0, #0]
+	BIC r1, r1, #(0x3 << 26)	@set PC_13 (13*2=26) as input 00
+ 800026a:	f021 6140 	bic.w	r1, r1, #201326592	@ 0xc000000
+	STR r1, [r0]
+ 800026e:	6001      	str	r1, [r0, #0]
+	@I will setup pin 5 Port A as ouput in 3
+	LDR r0, =0x40020000 		@at A base address
+ 8000270:	4855      	ldr	r0, [pc, #340]	@ (80003c8 <EXTI15_10_IRQHandler+0x30>)
+	LDR r1, [r0]				@read GPIOA
+ 8000272:	6801      	ldr	r1, [r0, #0]
+	BIC r1, r1, #(0x3 << 10)		@clear PA _5 (5*2=10) to 00
+ 8000274:	f421 6140 	bic.w	r1, r1, #3072	@ 0xc00
+	ORR r1, r1, #(0x1 << 10)		@set PA_5 (5*2=10) as ouput 01
+ 8000278:	f441 6180 	orr.w	r1, r1, #1024	@ 0x400
+	STR r1, [r0]
+ 800027c:	6001      	str	r1, [r0, #0]
+	@now lets setup our interupts, I will make a systick interupt for our sleep and a interupt for our input pin using a tim5 timer
+	@this is a long prcoess but i looked up each step needed
+	LDR r0, =0x40023840 @this is the tim5 timer clock setup RCC->APB1ENR 5
+ 800027e:	4853      	ldr	r0, [pc, #332]	@ (80003cc <EXTI15_10_IRQHandler+0x34>)
+	LDR r1, [r0]
+ 8000280:	6801      	ldr	r1, [r0, #0]
+	ORR r1, r1, #(1 << 3) @clock 5
+ 8000282:	f041 0108 	orr.w	r1, r1, #8
+	STR r1, [r0]
+ 8000286:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40000C28    @clock prescaler we have 16mhz as default
+ 8000288:	4851      	ldr	r0, [pc, #324]	@ (80003d0 <EXTI15_10_IRQHandler+0x38>)
+	LDR r1, =15999
+ 800028a:	f643 617f 	movw	r1, #15999	@ 0x3e7f
+	STR r1, [r0]
+ 800028e:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40000C2C @clock ARR max it out
+ 8000290:	4850      	ldr	r0, [pc, #320]	@ (80003d4 <EXTI15_10_IRQHandler+0x3c>)
+	LDR r1, =0xFFFFFFFF
+ 8000292:	f04f 31ff 	mov.w	r1, #4294967295
+	STR r1, [r0]
+ 8000296:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40000C14
+ 8000298:	484f      	ldr	r0, [pc, #316]	@ (80003d8 <EXTI15_10_IRQHandler+0x40>)
+	MOV r1, #1
+ 800029a:	f04f 0101 	mov.w	r1, #1
+	STR r1, [r0]          @send event so prescale is right
+ 800029e:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40000C10   @tim_sr
+ 80002a0:	484e      	ldr	r0, [pc, #312]	@ (80003dc <EXTI15_10_IRQHandler+0x44>)
+	MOV r1, #0
+ 80002a2:	f04f 0100 	mov.w	r1, #0
+	STR r1, [r0]
+ 80002a6:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40000C24 @setting clock counter to 0
+ 80002a8:	484d      	ldr	r0, [pc, #308]	@ (80003e0 <EXTI15_10_IRQHandler+0x48>)
+	MOV r1, #0
+ 80002aa:	f04f 0100 	mov.w	r1, #0
+	STR r1, [r0]
+ 80002ae:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40000C00 @timer5_cnt  start
+ 80002b0:	484c      	ldr	r0, [pc, #304]	@ (80003e4 <EXTI15_10_IRQHandler+0x4c>)
+	LDR r1, [r0]
+ 80002b2:	6801      	ldr	r1, [r0, #0]
+	ORR r1, r1, #(1 << 0) @start timer
+ 80002b4:	f041 0101 	orr.w	r1, r1, #1
+	STR r1, [r0]
+ 80002b8:	6001      	str	r1, [r0, #0]
+	@first enable clock and gpio pin and set to input and no pull since board has resistor which we have done already
+	@-> APB2ENR enable SYSCFGEN -> Map PC_13 to EXTI 13 -> configure as falling or rising edge -> enable NVIC -> set priority below systick
+	LDR r0, =0x40023844 @APB2ENR
+ 80002ba:	484b      	ldr	r0, [pc, #300]	@ (80003e8 <EXTI15_10_IRQHandler+0x50>)
+	LDR r1, [r0]
+ 80002bc:	6801      	ldr	r1, [r0, #0]
+	ORR r1, r1, #(0x1 << 14) @syscfgen bit
+ 80002be:	f441 4180 	orr.w	r1, r1, #16384	@ 0x4000
+	STR r1, [r0]
+ 80002c2:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40013814 @SYSCFG_EXTICR4
+ 80002c4:	4849      	ldr	r0, [pc, #292]	@ (80003ec <EXTI15_10_IRQHandler+0x54>)
+	LDR r1, [r0]
+ 80002c6:	6801      	ldr	r1, [r0, #0]
+	BIC r1, r1, #(0xF << 4)		@clear all the bits since F is max for 4 bit number
+ 80002c8:	f021 01f0 	bic.w	r1, r1, #240	@ 0xf0
+	ORR r1, r1, #(2 << 4)		@port c
+ 80002cc:	f041 0120 	orr.w	r1, r1, #32
+	STR r1, [r0]
+ 80002d0:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40013C0C	@EXTI_FTSR on press send interupt
+ 80002d2:	4847      	ldr	r0, [pc, #284]	@ (80003f0 <EXTI15_10_IRQHandler+0x58>)
+	LDR r1, [r0]
+ 80002d4:	6801      	ldr	r1, [r0, #0]
+	ORR r1, r1, #(1 << 13)		@exti13
+ 80002d6:	f441 5100 	orr.w	r1, r1, #8192	@ 0x2000
+	STR r1, [r0]
+ 80002da:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40013C08 @disable release
+ 80002dc:	4845      	ldr	r0, [pc, #276]	@ (80003f4 <EXTI15_10_IRQHandler+0x5c>)
+	LDR r1, [r0]
+ 80002de:	6801      	ldr	r1, [r0, #0]
+	BIC r1, r1, #(1 << 13)
+ 80002e0:	f421 5100 	bic.w	r1, r1, #8192	@ 0x2000
+	STR r1, [r0]
+ 80002e4:	6001      	str	r1, [r0, #0]
+	LDR r0, =0x40013C00 @exti imr
+ 80002e6:	4844      	ldr	r0, [pc, #272]	@ (80003f8 <EXTI15_10_IRQHandler+0x60>)
+	LDR r1, [r0]
+ 80002e8:	6801      	ldr	r1, [r0, #0]
+	ORR r1, r1, #(1 << 13)
+ 80002ea:	f441 5100 	orr.w	r1, r1, #8192	@ 0x2000
+	STR r1, [r0]
+ 80002ee:	6001      	str	r1, [r0, #0]
+	@ clearing a flag
+	LDR r0, =0x40013C14
+ 80002f0:	4842      	ldr	r0, [pc, #264]	@ (80003fc <EXTI15_10_IRQHandler+0x64>)
+	MOV r1, #(1 << 13)
+ 80002f2:	f44f 5100 	mov.w	r1, #8192	@ 0x2000
+	STR r1, [r0]
+ 80002f6:	6001      	str	r1, [r0, #0]
+	LDR r0, =0xE000E100 @nvic_isr the exti from 10-15 shares EXTI15_10_IRQn whic represents 15*2+10 = isr 40 which is ISER1 register
+ 80002f8:	4841      	ldr	r0, [pc, #260]	@ (8000400 <EXTI15_10_IRQHandler+0x68>)
+	LDR r1, [r0, #4] @ 0xE000E100 + 4 isr[1] interupts 32–63
+ 80002fa:	6841      	ldr	r1, [r0, #4]
+	ORR r1, r1, #(1 << 8) @ 40 - 32
+ 80002fc:	f441 7180 	orr.w	r1, r1, #256	@ 0x100
+	STR r1, [r0, #4]
+ 8000300:	6041      	str	r1, [r0, #4]
+	LDR r0, =0xE000E400 @NVIC_IPR priority
+ 8000302:	4840      	ldr	r0, [pc, #256]	@ (8000404 <EXTI15_10_IRQHandler+0x6c>)
+	MOV r1, #0x20 @priority 2
+ 8000304:	f04f 0120 	mov.w	r1, #32
+	STRB r1, [r0, #40] @ipr 40th bit
+ 8000308:	f880 1028 	strb.w	r1, [r0, #40]	@ 0x28
+	LDR r0, =0x40023808 @testing
+ 800030c:	483e      	ldr	r0, [pc, #248]	@ (8000408 <EXTI15_10_IRQHandler+0x70>)
+	LDR r1, [r0]
+ 800030e:	6801      	ldr	r1, [r0, #0]
+	LDR r0, =0x40023800
+ 8000310:	4828      	ldr	r0, [pc, #160]	@ (80003b4 <EXTI15_10_IRQHandler+0x1c>)
+	LDR r1, [r0]@test ending
+ 8000312:	6801      	ldr	r1, [r0, #0]
+	LDR r1, =0x40020000 @gpio A led
+ 8000314:	492c      	ldr	r1, [pc, #176]	@ (80003c8 <EXTI15_10_IRQHandler+0x30>)
+	LDR r3, =0x40000C24 @timer5_counter adresss
+ 8000316:	4b32      	ldr	r3, [pc, #200]	@ (80003e0 <EXTI15_10_IRQHandler+0x48>)
+	LDR r0, [r1, #0x14]
+ 8000318:	6948      	ldr	r0, [r1, #20]
+	BIC r0, r0, #(1 << 5)
+ 800031a:	f020 0020 	bic.w	r0, r0, #32
+	STR r0, [r1, #0x14]
+ 800031e:	6148      	str	r0, [r1, #20]
+	CPSID i
+ 8000320:	b672      	cpsid	i
+   	B    run_loop    @branch to lowercase routine
+ 8000322:	e001      	b.n	8000328 <run_loop>
+
+08000324 <end>:
+
+end:
+   WFI
+ 8000324:	bf30      	wfi
+   B     end            @stop here
+ 8000326:	e7fd      	b.n	8000324 <end>
+
+08000328 <run_loop>:
+@----------------------------------------------------------------------
+@ I wrote it like this so we can do this more than once but for now thats once is enough
+run_loop:
+			@run the LCG Linear Congruential Generator https://www.geeksforgeeks.org/dsa/linear-congruence-method-for-generating-pseudo-random-numbers/
+			MUL r9, r7, r9		@we start by multiplying and dont worry about overflows
+ 8000328:	fb07 f909 	mul.w	r9, r7, r9
+			ADD  r9, r9, r8		@adding by the addder
+ 800032c:	44c1      	add	r9, r8
+			AND  r9, r9, r6		@instead of doing a modulo this allows me to use a AND instead for a power of 2
+ 800032e:	ea09 0906 	and.w	r9, r9, r6
+			MOV r5, #10			@we do mod 10 so we get a number from 0 - 9 + 1
+ 8000332:	f04f 050a 	mov.w	r5, #10
+			UDIV r4, r9, r5
+ 8000336:	fbb9 f4f5 	udiv	r4, r9, r5
+			MLS r4, r5, r4, r9
+ 800033a:	fb05 9414 	mls	r4, r5, r4, r9
+			ADDS r4, r4, #1
+ 800033e:	3401      	adds	r4, #1
+			@now that we got a random time lets tell our systick timer to wait that long
+			@I will use a flagging system so that button interupt doesnt interfere with the sleep function
+			LDR r0, =1000 	@setting up timer convert sec to ms
+ 8000340:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
+			MUL r4, r0, r4	@ random time in seconf times 1000 gets us ms wait time
+ 8000344:	fb00 f404 	mul.w	r4, r0, r4
+			LDR r0, [r3]	@this gets previous time for loop
+ 8000348:	6818      	ldr	r0, [r3, #0]
+
+0800034a <waiter>:
+			waiter: @this is a waiting loop that uses tim current-previous time and comparing it to the random time*1000 to see if we have waited enough
+				LDR r5, [r3]
+ 800034a:	681d      	ldr	r5, [r3, #0]
+				SUB r5, r5, r0
+ 800034c:	eba5 0500 	sub.w	r5, r5, r0
+				CMP r5, r4
+ 8000350:	42a5      	cmp	r5, r4
+				BLO waiter
+ 8000352:	d3fa      	bcc.n	800034a <waiter>
+			LDR r0, =0x40013C14 @this clears pending interupts
+ 8000354:	4829      	ldr	r0, [pc, #164]	@ (80003fc <EXTI15_10_IRQHandler+0x64>)
+			MOV r2, #(1 << 13)
+ 8000356:	f44f 5200 	mov.w	r2, #8192	@ 0x2000
+			STR r2, [r0]
+ 800035a:	6002      	str	r2, [r0, #0]
+			LDR r0, [r1, #0x14]	@turns on led
+ 800035c:	6948      	ldr	r0, [r1, #20]
+			ORR r0, r0, #(1 << 5)
+ 800035e:	f040 0020 	orr.w	r0, r0, #32
+			STR r0, [r1, #0x14]
+ 8000362:	6148      	str	r0, [r1, #20]
+			LDR r0, [r3]	@set the previous time here
+ 8000364:	6818      	ldr	r0, [r3, #0]
+			CPSIE i
+ 8000366:	b662      	cpsie	i
+
+08000368 <waitForInterupt>:
+			waitForInterupt: @this just a general polling loop that is able to handle multiple interupts
+    			LDR r4, =button_pressed
+ 8000368:	4c28      	ldr	r4, [pc, #160]	@ (800040c <EXTI15_10_IRQHandler+0x74>)
+    			LDR r4, [r4]
+ 800036a:	6824      	ldr	r4, [r4, #0]
+    			CMP r4, #0
+ 800036c:	2c00      	cmp	r4, #0
+    			BEQ sleeper
+ 800036e:	d011      	beq.n	8000394 <sleeper>
+			CPSID i
+ 8000370:	b672      	cpsid	i
+			LDR r2, =button_pressed @get the time in ms from shared memory
+ 8000372:	4a26      	ldr	r2, [pc, #152]	@ (800040c <EXTI15_10_IRQHandler+0x74>)
+			LDR r4, [r2]
+ 8000374:	6814      	ldr	r4, [r2, #0]
+			SUB r4, r4, r0 @difference from current- previous
+ 8000376:	eba4 0400 	sub.w	r4, r4, r0
+			MOV r0, #0	@reeset time to 0
+ 800037a:	f04f 0000 	mov.w	r0, #0
+			STR r0, [r2]
+ 800037e:	6010      	str	r0, [r2, #0]
+			LDR r0, [r1, #0x14]	@turn off light after pressing
+ 8000380:	6948      	ldr	r0, [r1, #20]
+			BIC r0, r0, #(1 << 5)
+ 8000382:	f020 0020 	bic.w	r0, r0, #32
+			STR r0, [r1, #0x14]
+ 8000386:	6148      	str	r0, [r1, #20]
+			LDR r0, =0x40000C00
+ 8000388:	4816      	ldr	r0, [pc, #88]	@ (80003e4 <EXTI15_10_IRQHandler+0x4c>)
+			LDR r5, [r0]
+ 800038a:	6805      	ldr	r5, [r0, #0]
+			BIC r5, r5, #(1 << 0) @stop timer
+ 800038c:	f025 0501 	bic.w	r5, r5, #1
+			STR r5, [r0]
+ 8000390:	6005      	str	r5, [r0, #0]
+			B end
+ 8000392:	e7c7      	b.n	8000324 <end>
+
+08000394 <sleeper>:
+
+sleeper:
+    WFI
+ 8000394:	bf30      	wfi
+    B waitForInterupt
+ 8000396:	e7e7      	b.n	8000368 <waitForInterupt>
+
+08000398 <EXTI15_10_IRQHandler>:
+
+.global EXTI15_10_IRQHandler
+.type EXTI15_10_IRQHandler, %function
+EXTI15_10_IRQHandler:
+		@interupt handler we usually handle multiple interupts here but not
+		PUSH {r4, r5}
+ 8000398:	b430      	push	{r4, r5}
+		LDR r5, =0x40000C24	@get counter from tim5
+ 800039a:	4d11      	ldr	r5, [pc, #68]	@ (80003e0 <EXTI15_10_IRQHandler+0x48>)
+		LDR r4, [r5]
+ 800039c:	682c      	ldr	r4, [r5, #0]
+    	LDR r5, =button_pressed
+ 800039e:	4d1b      	ldr	r5, [pc, #108]	@ (800040c <EXTI15_10_IRQHandler+0x74>)
+    	STR r4, [r5]              @set the time on button click
+ 80003a0:	602c      	str	r4, [r5, #0]
+		LDR r5, =0x40013C14 @clear pending
+ 80003a2:	4d16      	ldr	r5, [pc, #88]	@ (80003fc <EXTI15_10_IRQHandler+0x64>)
+    	MOV r4, #(1 << 13)
+ 80003a4:	f44f 5400 	mov.w	r4, #8192	@ 0x2000
+    	STR r4, [r5]
+ 80003a8:	602c      	str	r4, [r5, #0]
+    	POP {r4, r5}
+ 80003aa:	bc30      	pop	{r4, r5}
+		BX lr
+ 80003ac:	4770      	bx	lr
+ 80003ae:	0000      	.short	0x0000
+	LDR r0, =0xE0042004      @ DBGMCU_CR
+ 80003b0:	e0042004 	.word	0xe0042004
+	LDR r0, =0x40023800
+ 80003b4:	40023800 	.word	0x40023800
+    LDR r0, =0x40007000
+ 80003b8:	40007000 	.word	0x40007000
+	LDR r0, =0x40002800
+ 80003bc:	40002800 	.word	0x40002800
+	LDR r0, =0x40023830 		@ rcc AHB1ENR base address
+ 80003c0:	40023830 	.word	0x40023830
+	LDR r0, =0x40020800 		@at Port C base address
+ 80003c4:	40020800 	.word	0x40020800
+	LDR r0, =0x40020000 		@at A base address
+ 80003c8:	40020000 	.word	0x40020000
+	LDR r0, =0x40023840 @this is the tim5 timer clock setup RCC->APB1ENR 5
+ 80003cc:	40023840 	.word	0x40023840
+	LDR r0, =0x40000C28    @clock prescaler we have 16mhz as default
+ 80003d0:	40000c28 	.word	0x40000c28
+	LDR r0, =0x40000C2C @clock ARR max it out
+ 80003d4:	40000c2c 	.word	0x40000c2c
+	LDR r0, =0x40000C14
+ 80003d8:	40000c14 	.word	0x40000c14
+	LDR r0, =0x40000C10   @tim_sr
+ 80003dc:	40000c10 	.word	0x40000c10
+	LDR r0, =0x40000C24 @setting clock counter to 0
+ 80003e0:	40000c24 	.word	0x40000c24
+	LDR r0, =0x40000C00 @timer5_cnt  start
+ 80003e4:	40000c00 	.word	0x40000c00
+	LDR r0, =0x40023844 @APB2ENR
+ 80003e8:	40023844 	.word	0x40023844
+	LDR r0, =0x40013814 @SYSCFG_EXTICR4
+ 80003ec:	40013814 	.word	0x40013814
+	LDR r0, =0x40013C0C	@EXTI_FTSR on press send interupt
+ 80003f0:	40013c0c 	.word	0x40013c0c
+	LDR r0, =0x40013C08 @disable release
+ 80003f4:	40013c08 	.word	0x40013c08
+	LDR r0, =0x40013C00 @exti imr
+ 80003f8:	40013c00 	.word	0x40013c00
+	LDR r0, =0x40013C14
+ 80003fc:	40013c14 	.word	0x40013c14
+	LDR r0, =0xE000E100 @nvic_isr the exti from 10-15 shares EXTI15_10_IRQn whic represents 15*2+10 = isr 40 which is ISER1 register
+ 8000400:	e000e100 	.word	0xe000e100
+	LDR r0, =0xE000E400 @NVIC_IPR priority
+ 8000404:	e000e400 	.word	0xe000e400
+	LDR r0, =0x40023808 @testing
+ 8000408:	40023808 	.word	0x40023808
+    			LDR r4, =button_pressed
+ 800040c:	20000000 	.word	0x20000000
+
+08000410 <Reset_Handler>:
+
+  .section .text.Reset_Handler
+  .weak Reset_Handler
+  .type Reset_Handler, %function
+Reset_Handler:
+  ldr   r0, =_estack
+ 8000410:	480d      	ldr	r0, [pc, #52]	@ (8000448 <LoopForever+0x2>)
+  mov   sp, r0          /* set stack pointer */
+ 8000412:	4685      	mov	sp, r0
+/* Call the clock system initialization function.*/
+  bl  SystemInit
+ 8000414:	f3af 8000 	nop.w
+
+/* Copy the data segment initializers from flash to SRAM */
+  ldr r0, =_sdata
+ 8000418:	480c      	ldr	r0, [pc, #48]	@ (800044c <LoopForever+0x6>)
+  ldr r1, =_edata
+ 800041a:	490d      	ldr	r1, [pc, #52]	@ (8000450 <LoopForever+0xa>)
+  ldr r2, =_sidata
+ 800041c:	4a0d      	ldr	r2, [pc, #52]	@ (8000454 <LoopForever+0xe>)
+  movs r3, #0
+ 800041e:	2300      	movs	r3, #0
+  b LoopCopyDataInit
+ 8000420:	e002      	b.n	8000428 <LoopCopyDataInit>
+
+08000422 <CopyDataInit>:
+
+CopyDataInit:
+  ldr r4, [r2, r3]
+ 8000422:	58d4      	ldr	r4, [r2, r3]
+  str r4, [r0, r3]
+ 8000424:	50c4      	str	r4, [r0, r3]
+  adds r3, r3, #4
+ 8000426:	3304      	adds	r3, #4
+
+08000428 <LoopCopyDataInit>:
+
+LoopCopyDataInit:
+  adds r4, r0, r3
+ 8000428:	18c4      	adds	r4, r0, r3
+  cmp r4, r1
+ 800042a:	428c      	cmp	r4, r1
+  bcc CopyDataInit
+ 800042c:	d3f9      	bcc.n	8000422 <CopyDataInit>
+
+/* Zero fill the bss segment. */
+  ldr r2, =_sbss
+ 800042e:	4a0a      	ldr	r2, [pc, #40]	@ (8000458 <LoopForever+0x12>)
+  ldr r4, =_ebss
+ 8000430:	4c0a      	ldr	r4, [pc, #40]	@ (800045c <LoopForever+0x16>)
+  movs r3, #0
+ 8000432:	2300      	movs	r3, #0
+  b LoopFillZerobss
+ 8000434:	e001      	b.n	800043a <LoopFillZerobss>
+
+08000436 <FillZerobss>:
+
+FillZerobss:
+  str  r3, [r2]
+ 8000436:	6013      	str	r3, [r2, #0]
+  adds r2, r2, #4
+ 8000438:	3204      	adds	r2, #4
+
+0800043a <LoopFillZerobss>:
+
+LoopFillZerobss:
+  cmp r2, r4
+ 800043a:	42a2      	cmp	r2, r4
+  bcc FillZerobss
+ 800043c:	d3fb      	bcc.n	8000436 <FillZerobss>
+
+
+/* Call static constructors */
+  bl __libc_init_array
+ 800043e:	f000 f811 	bl	8000464 <__libc_init_array>
+/* Call the application's entry point.*/
+
+  b main
+ 8000442:	f7ff bec7 	b.w	80001d4 <main>
+
+08000446 <LoopForever>:
+
+LoopForever:
+  b LoopForever
+ 8000446:	e7fe      	b.n	8000446 <LoopForever>
+  ldr   r0, =_estack
+ 8000448:	20018000 	.word	0x20018000
+  ldr r0, =_sdata
+ 800044c:	20000000 	.word	0x20000000
+  ldr r1, =_edata
+ 8000450:	20000004 	.word	0x20000004
+  ldr r2, =_sidata
+ 8000454:	080004cc 	.word	0x080004cc
+  ldr r2, =_sbss
+ 8000458:	20000004 	.word	0x20000004
+  ldr r4, =_ebss
+ 800045c:	20000020 	.word	0x20000020
+
+08000460 <ADC_IRQHandler>:
+ * @retval : None
+*/
+  .section .text.Default_Handler,"ax",%progbits
+Default_Handler:
+Infinite_Loop:
+  b Infinite_Loop
+ 8000460:	e7fe      	b.n	8000460 <ADC_IRQHandler>
+	...
+
+08000464 <__libc_init_array>:
+ 8000464:	b570      	push	{r4, r5, r6, lr}
+ 8000466:	4b0d      	ldr	r3, [pc, #52]	@ (800049c <__libc_init_array+0x38>)
+ 8000468:	4d0d      	ldr	r5, [pc, #52]	@ (80004a0 <__libc_init_array+0x3c>)
+ 800046a:	1b5b      	subs	r3, r3, r5
+ 800046c:	109c      	asrs	r4, r3, #2
+ 800046e:	2600      	movs	r6, #0
+ 8000470:	42a6      	cmp	r6, r4
+ 8000472:	d109      	bne.n	8000488 <__libc_init_array+0x24>
+ 8000474:	f000 f81a 	bl	80004ac <_init>
+ 8000478:	4d0a      	ldr	r5, [pc, #40]	@ (80004a4 <__libc_init_array+0x40>)
+ 800047a:	4b0b      	ldr	r3, [pc, #44]	@ (80004a8 <__libc_init_array+0x44>)
+ 800047c:	1b5b      	subs	r3, r3, r5
+ 800047e:	109c      	asrs	r4, r3, #2
+ 8000480:	2600      	movs	r6, #0
+ 8000482:	42a6      	cmp	r6, r4
+ 8000484:	d105      	bne.n	8000492 <__libc_init_array+0x2e>
+ 8000486:	bd70      	pop	{r4, r5, r6, pc}
+ 8000488:	f855 3b04 	ldr.w	r3, [r5], #4
+ 800048c:	4798      	blx	r3
+ 800048e:	3601      	adds	r6, #1
+ 8000490:	e7ee      	b.n	8000470 <__libc_init_array+0xc>
+ 8000492:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8000496:	4798      	blx	r3
+ 8000498:	3601      	adds	r6, #1
+ 800049a:	e7f2      	b.n	8000482 <__libc_init_array+0x1e>
+ 800049c:	080004c4 	.word	0x080004c4
+ 80004a0:	080004c4 	.word	0x080004c4
+ 80004a4:	080004c4 	.word	0x080004c4
+ 80004a8:	080004c8 	.word	0x080004c8
+
+080004ac <_init>:
+ 80004ac:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 80004ae:	bf00      	nop
+ 80004b0:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80004b2:	bc08      	pop	{r3}
+ 80004b4:	469e      	mov	lr, r3
+ 80004b6:	4770      	bx	lr
+
+080004b8 <_fini>:
+ 80004b8:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 80004ba:	bf00      	nop
+ 80004bc:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80004be:	bc08      	pop	{r3}
+ 80004c0:	469e      	mov	lr, r3
+ 80004c2:	4770      	bx	lr
