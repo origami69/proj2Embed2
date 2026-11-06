@@ -195,10 +195,11 @@ run_loop:
 			LDR r0, [r3]	@set the previous time here
 			CPSIE i
 			waitForInterupt: @this just a general polling loop that is able to handle multiple interupts
+				WFI
     			LDR r4, =button_pressed
     			LDR r4, [r4]
     			CMP r4, #0
-    			BEQ sleeper
+    			BEQ waitForInterupt
 			CPSID i
 			LDR r2, =button_pressed @get the time in ms from shared memory
 			LDR r4, [r2]
@@ -213,10 +214,6 @@ run_loop:
 			BIC r5, r5, #(1 << 0) @stop timer
 			STR r5, [r0]
 			B end
-
-sleeper:
-    WFI
-    B waitForInterupt
 
 
 .global EXTI15_10_IRQHandler
