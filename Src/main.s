@@ -127,11 +127,11 @@ main:
 	BIC r1, r1, #(0xF << 4)		@clear all the bits since F is max for 4 bit number
 	ORR r1, r1, #(2 << 4)		@port c
 	STR r1, [r0]
-	LDR r0, =0x40013C0C	@EXTI_FTSR on press send interupt
+	LDR r0, =0x40013C08	@EXTI_RTSR on press send interupt
 	LDR r1, [r0]
 	ORR r1, r1, #(1 << 13)		@exti13
 	STR r1, [r0]
-	LDR r0, =0x40013C08 @disable release
+	LDR r0, =0x40013C0C @disable release/falling edge
 	LDR r1, [r0]
 	BIC r1, r1, #(1 << 13)
 	STR r1, [r0]
