@@ -127,11 +127,11 @@ main:
 	BIC r1, r1, #(0xF << 4)		@clear all the bits since F is max for 4 bit number
 	ORR r1, r1, #(2 << 4)		@port c
 	STR r1, [r0]
-	LDR r0, =0x40013C0C	@EXTI_RTSR on press send interupt
+	LDR r0, =0x40013C0C	@EXTI_FTSR on press send interupt
 	LDR r1, [r0]
 	ORR r1, r1, #(1 << 13)		@exti13
 	STR r1, [r0]
-	LDR r0, =0x40013C08 @disable release/falling edge
+	LDR r0, =0x40013C08 @disable release
 	LDR r1, [r0]
 	BIC r1, r1, #(1 << 13)
 	STR r1, [r0]
@@ -150,10 +150,6 @@ main:
 	LDR r0, =0xE000E400 @NVIC_IPR priority
 	MOV r1, #0x20 @priority 2
 	STRB r1, [r0, #40] @ipr 40th bit
-	LDR r0, =0x40023808 @testing
-	LDR r1, [r0]
-	LDR r0, =0x40023800
-	LDR r1, [r0]@test ending
 	LDR r1, =0x40020000 @gpio A led
 	LDR r3, =0x40000C24 @timer5_counter adresss
 	LDR r0, [r1, #0x14]
@@ -199,7 +195,7 @@ run_loop:
     			LDR r4, =button_pressed
     			LDR r4, [r4]
     			CMP r4, #0
-    			BEQ waitForInterupt
+    			BEQ slewaitForInterupteper
 			CPSID i
 			LDR r2, =button_pressed @get the time in ms from shared memory
 			LDR r4, [r2]
@@ -225,12 +221,15 @@ EXTI15_10_IRQHandler:
 		LDR r4, [r5]
     	LDR r5, =button_pressed
     	STR r4, [r5]              @set the time on button click
+		LDR r5, =0x40013C00 @stop any further interupts
+        LDR r4, [r5]
+        BIC r4, r4, #(1 << 13)
+        STR r4, [r5]
 		LDR r5, =0x40013C14 @clear pending
     	MOV r4, #(1 << 13)
     	STR r4, [r5]
     	POP {r4, r5}
 		BX lr
-
 
 
 
