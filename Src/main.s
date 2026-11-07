@@ -195,7 +195,7 @@ run_loop:
     			LDR r4, =button_pressed
     			LDR r4, [r4]
     			CMP r4, #0
-    			BEQ waitForInterupteper
+    			BEQ waitForInterupt
 			CPSID i
 			LDR r2, =button_pressed @get the time in ms from shared memory
 			LDR r4, [r2]
